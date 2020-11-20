@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="panda_gazebo" params="robot_name">
+
+        <!-- Link0 -->
+        <gazebo reference="${robot_name}_link0">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link1 -->
+        <gazebo reference="${robot_name}_link1">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link2 -->
+        <gazebo reference="${robot_name}_link2">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link3 -->
+        <gazebo reference="${robot_name}_link3">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link4 -->
+        <gazebo reference="${robot_name}_link4">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link5 -->
+        <gazebo reference="${robot_name}_link5">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link6 -->
+        <gazebo reference="${robot_name}_link6">
+            <material>Gazebo/White</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link7 -->
+        <gazebo reference="${robot_name}_link7">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Link8 -->
+        <gazebo reference="${robot_name}_link8">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- LinkHand -->
+        <gazebo reference="${robot_name}_hand">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- LinkRightFinger -->
+        <gazebo reference="${robot_name}_rightfinger">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- LinkLeftFinger -->
+        <gazebo reference="${robot_name}_leftfinger">
+            <material>Gazebo/Grey</material>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+        </gazebo>
+
+        <!-- Cam -->
+        <gazebo reference="${robot_name}_cam">
+          <material>Gazebo/Grey</material>
+          <mu1>0.2</mu1>
+          <mu2>0.2</mu2>
+          <sensor name="camera" type="depth">
+            <update_rate>30</update_rate>
+            <camera>
+              <horizontal_fov>1.047198</horizontal_fov>
+              <image>
+                <width>640</width>
+                <height>480</height>
+                <format>R8G8B8</format>
+              </image>
+              <clip>
+                <near>0.05</near>
+                <far>3</far>
+              </clip>
+            </camera>
+	        <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+	          <baseline>0.2</baseline>
+	          <alwayson>true</alwayson>
+	          <!-- Keep this zero, updae_rate in the parent <sensor> tag will control the frame rate. -->
+	          <updateRate>0.0</updateRate>
+	          <cameraName>camera_ir</cameraName>
+	          <imageTopicName>/camera/color/image_raw</imageTopicName>
+	          <cameraInfoTopicName>/camera/color/camera_info</cameraInfoTopicName>
+	          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+	          <depthImageCameraInfoTopicName>/camera/depth/camera_info</depthImageCameraInfoTopicName>
+              <!-- due to a bug with ocotmaps nodelets the input for this nodelet cannot be remaped   -->
+              <!-- therefore the published topic must be in this odd namespace and with this odd name -->
+	          <pointCloudTopicName>/manager/cloud_in</pointCloudTopicName>
+	          <frameName>/camera_depth_optical_frame</frameName>
+	          <pointCloudCutoff>0.5</pointCloudCutoff>
+	          <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+	          <distortionK1>0</distortionK1>
+	          <distortionK2>0</distortionK2>
+	          <distortionK3>0</distortionK3>
+	          <distortionT1>0</distortionT1>
+	          <distortionT2>0</distortionT2>
+	          <CxPrime>0</CxPrime>
+	          <Cx>0</Cx>
+	          <Cy>0</Cy>
+	          <focalLength>0</focalLength>
+	          <hackBaseline>0</hackBaseline>
+	        </plugin>
+          </sensor>
+        </gazebo>
+
+      </xacro:macro>
+
+    </robot>

@@ -1,0 +1,106 @@
+<launch>
+  <arg name="nodelet_manager" default="nodelet_manager"/>
+  <arg name="tf_2camera" default="0 0 0 0 0 0"/>
+  <arg name="enable_color" default="false"/>
+  <arg name="camera1_name" default="cam_1"/>
+  <arg name="camera2_name" default="cam_2"/>
+  <arg name="camera1_serial" default="617205002698"/>
+  <arg name="camera2_serial" default="618206002406"/>
+
+  <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
+  <node ns="manager" pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
+    <param name="num_worker_threads" value="16"/>
+  </node>
+
+  <!-- Starting the realsense2-camera using the realsense2-launch-file -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Set the nodelet manager -->
+    <arg name="external_manager" value="true"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+
+    <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
+    <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
+    <arg name="camera" value="$(arg camera1_name)"/>
+    <arg name="serial_no" value="$(arg camera1_serial)"/>
+    <arg name="filters" value="pointcloud,decimation,temporal"/>
+    
+
+    <!-- Point Cloud settings -->
+    <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    <arg if="$(arg enable_color)" name="enable_color" value="true" /> 
+    <!-- to adjust the frames per second these all three args need to uncommand -->
+    <!--arg name="depth_fps" value="10"/-->
+    <!--arg name="infra_fps" value="10"/-->
+    <!--arg name="color_fps" value="10"/-->
+
+  </include>
+
+  <!-- Starting the realsense2-camera using the realsense2-launch-file -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Set the nodelet manager -->
+    <arg name="external_manager" value="true"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+
+    <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
+    <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
+    <arg name="camera" value="$(arg camera2_name)"/>
+    <arg name="serial_no" value="$(arg camera2_serial)"/>
+    <arg name="filters" value="pointcloud,decimation,temporal"/>
+
+    <!-- Point Cloud settings -->
+    <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    <arg if="$(arg enable_color)" name="enable_color" value="true" /> 
+
+
+  </include>
+  <!-- load the settings for the Intel RealSense decimation filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      name="decimationSettingsLoader_1"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_1/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
+      />
+  <node
+      name="decimationSettingsLoader_2"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_2/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
+      />
+
+  <!-- load the settings for the Intel RealSense temporal filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      name="temporalSettingsLoader_1"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_1/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
+      />
+    <node
+      name="temporalSettingsLoader_2"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_2/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
+      />
+			
+	<group ns="PCLNodelets">
+    <!-- Starting PCL-Filter-Nodelet -->
+    <node pkg="nodelet" type="nodelet" name="PCLFilterNodelet" args="load pcl_filter/PCLFilterNodelet /manager/$(arg nodelet_manager)"
+          output="screen">
+      <remap from="/camera/depth/color/points" to="/PCLNodelets/PCLJointNodelet/jointedPointCloud"/>
+    </node>
+
+    <!-- starting PCL-Cloud-Joint-Nodelet -->
+    <node pkg="nodelet" type="nodelet" name="PCLJointNodelet" args="load pcl_filter/PCLJointNodelet /manager/$(arg nodelet_manager)"
+          output="screen">
+    </node>
+  </group>
+  
+
+  <!-- transform nodelet of 2 cameras -->>
+  <node pkg="tf" type="static_transform_publisher" name="rs_2camera" args="$(arg tf_2camera) /$(arg camera1_name)_link /$(arg camera2_name)_link 100"/>
+  
+  <!-- display on rviz-->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find pcl_filter)/config/seminar.rviz" required="true" />
+
+</launch>

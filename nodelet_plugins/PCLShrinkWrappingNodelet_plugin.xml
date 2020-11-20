@@ -1,0 +1,7 @@
+<library path="lib/libPCLShrinkWrappingNodelet">
+  <class name="pcl_filter/PCLShrinkWrappingNodelet" type="pcl_filter::PCLShrinkWrappingNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      PCL-Nodelet for the Shrink-Wrapping-Algorithm
+    </description>
+  </class>
+</library>

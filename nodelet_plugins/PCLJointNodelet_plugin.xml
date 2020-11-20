@@ -1,0 +1,7 @@
+<library path="lib/libPCLJointNodelet">
+  <class name="pcl_filter/PCLJointNodelet" type="pcl_filter::PCLJointNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      PCL-Joint-Nodelet for 2 Pointcloud from 2 camera to joint
+    </description>
+  </class>
+</library>

@@ -1,0 +1,112 @@
+<launch>
+  <arg name="nodelet_manager" default="nodelet_manager"/>
+  <arg name="simulation" default="false"/>
+  <arg name="octomaps" default="false"/>
+  <arg name="boundingmesh" default="false"/>
+  <arg name="robot_ip" default="192.168.3.112"/>
+
+  <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
+  <node ns="manager" pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
+    <param name="num_worker_threads" value="16"/>
+  </node>
+
+  <!-- Starting panda_simulation -->
+  <include if="$(arg simulation)" file="$(find pcl_filter)/launch/gazebo_simulation.launch">
+  </include>
+
+  <!-- Starting the realsense2-camera using the realsense2-launch-file -->
+  <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Set the nodelet manager -->
+    <arg name="external_manager" value="true"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+
+    <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
+    <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
+    <arg name="filters" value="pointcloud,decimation,temporal"/>
+
+    <!-- Point Cloud settings -->
+    <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    <!--  <arg name="enable_color" value="false" />  -->
+
+    <!-- to adjust the frames per second these all three args need to uncommand -->
+    <!--arg name="depth_fps" value="10"/-->
+    <!--arg name="infra_fps" value="10"/-->
+    <!--arg name="color_fps" value="10"/-->
+
+    <!-- due to a bug with ocotmaps nodelets the input for this nodelet cannot be remaped   -->
+    <!-- therefore the published topic must be in this odd namespace and with this odd name -->
+
+  </include>
+
+  <!-- load the settings for the Intel RealSense decimation filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      unless="$(arg simulation)"
+      name="decimationSettingsLoader"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /camera/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
+      />
+
+  <!-- load the settings for the Intel RealSense temporal filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      unless="$(arg simulation)"
+      name="temporalSettingsLoader"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /camera/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
+      />
+
+  <!-- Starting franka_visualization using the launch-file provided with franka_ros -->
+  <include ns="robot" unless="$(arg simulation)" file="$(find pcl_filter)/launch/franka_visualization.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)"/>
+  </include>
+
+  <!-- Octomaps-Nodelet -->
+  <group>
+    <node if="$(arg octomaps)" pkg="nodelet" type="nodelet" name="octomap_server_nodelet" args="load octomap_server/OctomapServerNodelet
+        /manager/$(arg nodelet_manager)">
+    <!--node if="$(arg octomaps)" pkg="octomap_server" type="octomap_server_node" name="octomap_server"-->
+	  <param name="resolution" value="0.05" />
+
+	  <!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+	  <param name="frame_id" type="string" value="world" />
+
+	  <!-- maximum range to integrate (speedup!) -->
+      <param name="sensor_model/max_range" value="5.0" />
+
+      <!-- when true all topics are update when the map is changing; false should improve the performance -->
+      <param name="latch" type="bool" value="false" />
+
+	  <!-- data source to integrate (PointCloud2) -->
+      <!-- due to a bug with ocotmaps nodelets the input for this nodelet cannot be remaped   -->
+      <!-- therefore the published topic cannot be remaped                                    -->
+      <!--remap from="/manager/cloud_in" to="/camera/depth/points" /-->
+      <!--remap if="$(arg simulation)" from="/manager/cloud_in" to="/camera/depth/points" /-->
+      <remap from="/camera/depth/color/points" to="/manager/cloud_in"/>
+    </node>
+  </group>
+
+  <group ns="PCLNodelets">
+    <!-- Starting PCL-Filter-Nodelet -->
+    <node pkg="nodelet" type="nodelet" name="PCLFilterNodelet" args="load pcl_filter/PCLFilterNodelet /manager/$(arg nodelet_manager)"
+          output="screen">
+      <!-- due to a bug with ocotmaps nodelets the input for this nodelet cannot be remaped   -->
+      <!-- therefore the published topic must be in this odd namespace and with this odd name -->
+      <remap if="$(arg simulation)" from="/camera/depth/color/points" to="/manager/cloud_in"/>
+      <param if="$(arg simulation)" name="useDownsample" type="bool" value="true" />
+    </node>
+
+    <!-- starting PCL-Cloud-Mirror-Nodelet -->
+    <node pkg="nodelet" type="nodelet" name="PCLCloudMirrorNodelet" args="load pcl_filter/PCLCloudMirrorNodelet /manager/$(arg nodelet_manager)"
+          output="screen">
+    </node>
+
+    <!-- Starting PCL-ShrinkWrapping-Nodelet -->
+    <!-- <node pkg="nodelet" type="nodelet" name="PCLShrinkWrappingNodelet" args="load pcl_filter/PCLShrinkWrappingNodelet /manager/$(arg nodelet_manager)"
+          output="screen">
+      <param name="useBoundingMesh" type="bool" value="$(arg boundingmesh)"/>
+    </node>  -->
+  </group>
+</launch>

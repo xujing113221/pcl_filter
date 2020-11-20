@@ -1,0 +1,29 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  filter_smooth_alpha: 0.13
+  filter_smooth_delta: 100
+  frames_queue_size: 16
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      filter_smooth_alpha: 0.13
+      filter_smooth_delta: 100
+      frames_queue_size: 16
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      holes_fill: 3
+      id: 0
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      state: true
+      stream_filter: 1
+      stream_format_filter: 1
+      stream_index_filter: -1
+      type: ''
+    state: []
+  holes_fill: 3
+  stream_filter: 1
+  stream_format_filter: 1
+  stream_index_filter: -1
+state: []

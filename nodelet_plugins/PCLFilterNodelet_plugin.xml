@@ -1,0 +1,7 @@
+<library path="lib/libPCLFilterNodelet">
+  <class name="pcl_filter/PCLFilterNodelet" type="pcl_filter::PCLFilterNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      PCL-Filter-Nodelet for cluster selection
+    </description>
+  </class>
+</library>

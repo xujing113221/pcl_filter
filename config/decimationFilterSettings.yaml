@@ -1,0 +1,25 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  filter_magnitude: 4
+  frames_queue_size: 23
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      filter_magnitude: 7
+      frames_queue_size: 23
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      id: 0
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      state: true
+      stream_filter: 1
+      stream_format_filter: 1
+      stream_index_filter: -1
+      type: ''
+    state: []
+  stream_filter: 1
+  stream_format_filter: 1
+  stream_index_filter: -1
+state: []
