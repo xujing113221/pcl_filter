@@ -17,14 +17,14 @@ namespace pcl_filter
 void PCLJointNodelet::onInit(){
   NODELET_INFO("Initializing PCL Joint nodelet...");
   private_nh = getPrivateNodeHandle();
-  message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam1(private_nh, "/cam_1/depth/color/points", 1);
-  message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam2(private_nh, "/cam_2/depth/color/points", 1);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam1(private_nh, "/cam_1/depth/color/points", 10);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam2(private_nh, "/cam_2/depth/color/points", 10);
 
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::PointCloud2> MySyncPolicy;
   message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), sub_cam1, sub_cam2);
   sync.registerCallback(boost::bind(&PCLJointNodelet::pointCloudCallback, this,_1, _2));
 
-  pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("jointedPointCloud",1);
+  pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("jointedPointCloud",10);
 
   ros::spin();
 }
@@ -32,27 +32,13 @@ void PCLJointNodelet::onInit(){
 /***************************************************************************//**
  * The callback function called when something was published to the subscribed topic
  *
- * creates a handler thread that will do the work the caller of the callback function can return
+ * The function handles the Jointing of the received point cloud
  *
  * @param left_input The message received from ROS as ConstPtr aka boost::shared_pointer
  * @param right_input The message received from ROS as ConstPtr aka boost::shared_pointer
  *
  ******************************************************************************/
 void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input){
-
-  std::thread handler(&PCLJointNodelet::handler, this, left_input,right_input);
-
-  handler.detach();
-}
-
-/***************************************************************************//**
- * The handler thread will handles the Jointing of the received point cloud
- *
- * @param left_input The message received from ROS as ConstPtr aka boost::shared_pointer
- * @param right_input The message received from ROS as ConstPtr aka boost::shared_pointer
- *
- ******************************************************************************/
-void PCLJointNodelet::handler(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr left_pcl_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
   pcl::fromROSMsg(*left_input, *left_pcl_pointcloud);
@@ -84,7 +70,8 @@ void PCLJointNodelet::handler(const sensor_msgs::PointCloud2::ConstPtr& left_inp
   sensor_msgs::PointCloud2 pub_pointcloud;
   pcl::toROSMsg(*cloud_filtered, pub_pointcloud);
 
-  pub_Cloud.publish(pub_pointcloud);
+  if(pub_Cloud.getNumSubscribers() > 0)
+    pub_Cloud.publish(pub_pointcloud);
 
 }
 }

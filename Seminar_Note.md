@@ -7,6 +7,8 @@
 
     realsense-viewer
 
+run plugin:
+    rosrun nodelet nodelet load pcl_filter/PCLFilterNodelet /manager/nodelet_manager __name:=PCLFilterNodelet /camera/depth/color/points:=/PCLNodelets/PCLJointNodelet/jointedPointCloud
 
 
 ### Realsense Camera 

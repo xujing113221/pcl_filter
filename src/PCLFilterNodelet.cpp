@@ -17,9 +17,10 @@ namespace pcl_filter{
 void PCLFilterNodelet::onInit(){
   NODELET_INFO("Initializing PCL Filter nodelet...");
   private_nh = getPrivateNodeHandle();
-  sub_ = private_nh.subscribe("/camera/depth/color/points", 1, &PCLFilterNodelet::pointCloudCallback, this);
-  pub_Cluster = private_nh.advertise<pcl_filter::CloudClusters>("filteredPointClusters",1);
-  pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("filterdPointCloud",1);
+  sub_ = private_nh.subscribe("/camera/depth/color/points", 10, &PCLFilterNodelet::pointCloudCallback, this);
+  // sub_ = private_nh.subscribe("/PCLNodelets/PCLJointNodelet/jointedPointCloud", 1, &PCLFilterNodelet::pointCloudCallback, this);
+  pub_Cluster = private_nh.advertise<pcl_filter::CloudClusters>("filteredPointClusters",10);
+  pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("filterdPointCloud",10);
 
   private_nh.param("useDownsample", useDownsample, false);
   NODELET_INFO(useDownsample ? "Filter nodelet is using downsampling!" : "Filter nodelet is not using downsampling!");
@@ -37,9 +38,11 @@ void PCLFilterNodelet::pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr
 
   // NODELET_INFO("Got new point cloud");
 
-  std::thread handler(&PCLFilterNodelet::handler, this, message);
+  // std::thread handler(&PCLFilterNodelet::handler, this, message);
 
-  handler.detach();
+  handler(message);
+
+  // handler.detach();
 }
 
 /***************************************************************************//**
@@ -153,6 +156,7 @@ void PCLFilterNodelet::handler(const sensor_msgs::PointCloud2ConstPtr message){
     msg.cluster_indices.push_back(msgIndices);
     }
 
+ if(pub_Cluster.getNumSubscribers()>0)
   pub_Cluster.publish(msg);
 
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -169,7 +173,8 @@ void PCLFilterNodelet::handler(const sensor_msgs::PointCloud2ConstPtr message){
   //   pcl::PCDWriter writer;
   //   writer.write(filename,*cloud);
 
-  pub_Cloud.publish(msg.pointCloud);
+  if(pub_Cloud.getNumSubscribers()>0)
+    pub_Cloud.publish(msg.pointCloud);
 }
 
 }

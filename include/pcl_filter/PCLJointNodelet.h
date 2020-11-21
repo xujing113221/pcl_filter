@@ -20,21 +20,16 @@ using namespace message_filters;
 
 namespace pcl_filter
 {
-/** This nodelet receives point clouds from a depth camera or a gazebo simulation and prepares them for the next nodelets of the ERGA. */
+/** This nodelet receives point clouds from two depth cameras and joint them for the next nodelets . */
 class PCLJointNodelet : public nodelet::Nodelet
 {
  public:
   virtual void onInit();
   void pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input);
-  void handler(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input);
 
  private:
   ros::NodeHandle private_nh;
-//   ros::Subscriber sub_cam1;
-//   ros::Subscriber sub_cam2;
   ros::Publisher pub_Cloud;
-
-  bool useDownsample = true;
 };
 
 }

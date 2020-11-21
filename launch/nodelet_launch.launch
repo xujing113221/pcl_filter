@@ -99,9 +99,9 @@
     </node>
 
     <!-- starting PCL-Cloud-Mirror-Nodelet -->
-    <node pkg="nodelet" type="nodelet" name="PCLCloudMirrorNodelet" args="load pcl_filter/PCLCloudMirrorNodelet /manager/$(arg nodelet_manager)"
+    <!-- <node pkg="nodelet" type="nodelet" name="PCLCloudMirrorNodelet" args="load pcl_filter/PCLCloudMirrorNodelet /manager/$(arg nodelet_manager)"
           output="screen">
-    </node>
+    </node> -->
 
     <!-- Starting PCL-ShrinkWrapping-Nodelet -->
     <!-- <node pkg="nodelet" type="nodelet" name="PCLShrinkWrappingNodelet" args="load pcl_filter/PCLShrinkWrappingNodelet /manager/$(arg nodelet_manager)"
