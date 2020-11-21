@@ -148,9 +148,7 @@ void PCLFilterNodelet::handler(const sensor_msgs::PointCloud2ConstPtr message){
   msg.num_cluster = cluster_indices.size();
   pcl::toROSMsg(*cloud_filtered, msg.pointCloud);
 
-  for (std::vector<pcl::PointIndices>::const_iterator it =
-           cluster_indices.begin();
-       it != cluster_indices.end(); ++it) {
+  for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it) {
     pcl_msgs::PointIndices msgIndices;
     pcl_conversions::fromPCL(*it, msgIndices);
     msg.cluster_indices.push_back(msgIndices);
