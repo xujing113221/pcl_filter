@@ -63,10 +63,6 @@ run plugin:
 [Intel Realsense后处理过滤器](https://blog.csdn.net/dontla/article/details/103574458)
     rosrun rqt_reconfigure rqt_reconfigure
 
-### others
-
-install ros:
-    sudo apt install -y ros-melodic-desktop-full
 
 
 ### PointCloud filter
@@ -94,5 +90,18 @@ install ros:
 [Filtering 点云滤波](https://zhuanlan.zhihu.com/p/95983353)
 
 
+### Pointcloud tracking 
+
+Plan A:
+    track the center of point cluster
+Plan B:
+    optical flow
+Plan C:
+    karlmann filter
 
 
+
+### others
+
+install ros:
+    sudo apt install -y ros-melodic-desktop-full
