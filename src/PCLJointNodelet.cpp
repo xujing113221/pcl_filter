@@ -58,11 +58,14 @@ void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPt
   pcl::PointCloud<pcl::PointXYZ>::Ptr joint_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
   *joint_pointcloud = *left_pcl_pointcloud + *right_pcl_pointcloud;
 
+  
   // downsampling
+  float leaf_size = 0.04f;
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
   pcl::VoxelGrid<pcl::PointXYZ> sor;    
   sor.setInputCloud(joint_pointcloud);            
-  sor.setLeafSize(0.002f, 0.002f, 0.002f);   
+  sor.setLeafSize(leaf_size,leaf_size,leaf_size);   
+  // sor.setLeafSize(0.015f, 0.015f, 0.015f);
   sor.filter(*cloud_filtered);          
 
 

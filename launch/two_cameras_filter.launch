@@ -1,11 +1,11 @@
 <launch>
   <arg name="nodelet_manager" default="nodelet_manager"/>
-  <arg name="tf_2camera" default="0 0 0 0 0 0"/>
+  <arg name="tf_2camera" default="0.5062500000000004 0.6062500000000006 0 -84.0 0 0"/>
   <arg name="disable_color" default="true"/>
   <arg name="camera1_name" default="cam_1"/>
   <arg name="camera2_name" default="cam_2"/>
-  <arg name="camera1_serial" default="617205002698"/>
-  <arg name="camera2_serial" default="618206002406"/>
+  <arg name="camera1_serial" default="036222070486"/>
+  <arg name="camera2_serial" default="034422073314"/>
   <arg name="use_rviz" default="true"/>
 
   <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
