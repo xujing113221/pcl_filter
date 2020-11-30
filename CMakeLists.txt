@@ -195,6 +195,8 @@ src/PCLJointNodelet.cpp
 #    include/bounding-mesh/Release/libboundingmesh.a
 #    )
 
+
+
   # PCL-Joint Nodelet
   target_link_libraries(PCLJointNodelet
     ${PCL_LIBRARIES}
@@ -216,6 +218,10 @@ src/PCLJointNodelet.cpp
   if(catkin_EXPORTED_LIBRARIES)
     add_dependencies(PCLFilterNodelet ${catkin_EXPORTED_LIBRARIES})
   endif()
+
+  # PCL-read Point cloud
+  add_executable(read_pcd src/PCLReadPointcloud.cpp)
+  target_link_libraries(read_pcd ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
   # Mirror Nodelet
   # target_link_libraries(PCLCloudMirrorNodelet
