@@ -1,0 +1,91 @@
+<launch>
+  <arg name="nodelet_manager" default="nodelet_manager"/>
+  <arg name="tf_2camera" default="0.50625 0.60625 0 -84.0 0 0"/>
+  <arg name="disable_color" default="true"/>
+  <arg name="camera1_name" default="cam_1"/>
+  <arg name="camera2_name" default="cam_2"/>
+  <arg name="camera1_serial" default="036222070486"/>
+  <arg name="camera2_serial" default="034422073314"/>
+  <arg name="use_rviz" default="true"/>
+
+  <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
+  <node ns="manager" pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
+    <param name="num_worker_threads" value="16"/>
+  </node>
+
+  <!-- Starting the realsense2-camera using the realsense2-launch-file -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Set the nodelet manager -->
+    <arg name="external_manager" value="true"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+
+    <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
+    <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
+    <arg name="camera" value="$(arg camera1_name)"/>
+    <arg name="serial_no" value="$(arg camera1_serial)"/>
+    <arg name="filters" value="pointcloud,decimation,temporal"/>
+    
+
+    <!-- Point Cloud settings -->
+    <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    <arg if="$(arg disable_color)" name="enable_color" value="false" /> 
+    <!-- to adjust the frames per second these all three args need to uncommand -->
+    <!--arg name="depth_fps" value="10"/-->
+    <!--arg name="infra_fps" value="10"/-->
+    <!--arg name="color_fps" value="10"/-->
+  </include>
+
+  <!-- Starting the realsense2-camera using the realsense2-launch-file -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Set the nodelet manager -->
+    <arg name="external_manager" value="true"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+
+    <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
+    <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
+    <arg name="camera" value="$(arg camera2_name)"/>
+    <arg name="serial_no" value="$(arg camera2_serial)"/>
+    <arg name="filters" value="pointcloud,decimation,temporal"/>
+
+    <!-- Point Cloud settings -->
+    <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    <arg if="$(arg disable_color)" name="enable_color" value="false" /> 
+  </include>
+  <!-- load the settings for the Intel RealSense decimation filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      name="decimationSettingsLoader_1"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_1/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
+      />
+  <node
+      name="decimationSettingsLoader_2"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_2/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
+      />
+
+  <!-- load the settings for the Intel RealSense temporal filter of the camera -->
+  <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
+  <node
+      name="temporalSettingsLoader_1"
+      pkg="dynamic_reconfigure"
+      type="dynparam"
+      args="load /cam_1/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
+      />
+  <node
+    name="temporalSettingsLoader_2"
+    pkg="dynamic_reconfigure"
+    type="dynparam"
+    args="load /cam_2/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
+    />
+			
+
+  <!-- transform nodelet of 2 cameras -->>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="rs_2camera" args="$(arg tf_2camera) /$(arg camera1_name)_link /$(arg camera2_name)_link 10"/> -->
+
+  <!-- display on rviz-->
+  <node if="$(arg use_rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find pcl_filter)/config/seminar.rviz" required="true" />
+
+</launch>

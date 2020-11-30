@@ -1,6 +1,6 @@
 !!python/object/new:dynamic_reconfigure.encoding.Config
 dictitems:
-  filter_magnitude: 6
+  filter_magnitude: 4
   frames_queue_size: 23
   groups: !!python/object/new:dynamic_reconfigure.encoding.Config
     dictitems:

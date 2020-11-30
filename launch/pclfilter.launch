@@ -9,8 +9,7 @@
   </node>
 
   <!-- Starting panda_simulation -->
-  <include if="$(arg simulation)" file="$(find pcl_filter)/launch/gazebo_simulation.launch">
-  </include>
+  <node if="$(arg simulation)" name="read_pcd" pkg="pcl_filter" type="read_pcd" />
 
   <!-- Starting the realsense2-camera using the realsense2-launch-file -->
   <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
@@ -56,14 +55,15 @@
       args="load /camera/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
       />
 
+  
   <group ns="PCLNodelets">
     <!-- Starting PCL-Filter-Nodelet -->
-    <node pkg="nodelet" type="nodelet" name="PCLFilterNodelet" args="load pcl_filter/PCLFilterNodelet /manager/$(arg nodelet_manager)"
+    <node unless="$(arg simulation)" pkg="nodelet" type="nodelet" name="PCLFilterNodelet" args="load pcl_filter/PCLFilterNodelet /manager/$(arg nodelet_manager)"
           output="screen">
       <!-- due to a bug with ocotmaps nodelets the input for this nodelet cannot be remaped   -->
       <!-- therefore the published topic must be in this odd namespace and with this odd name -->
-      <remap if="$(arg simulation)" from="/camera/depth/color/points" to="/manager/cloud_in"/>
-      <param if="$(arg simulation)" name="useDownsample" type="bool" value="true" />
+      <!-- <remap if="$(arg simulation)" from="/camera/depth/color/points" to="/pcl_output"/> -->
+      <!-- <param if="$(arg simulation)" name="useDownsample" type="bool" value="true" /> -->
     </node>
 
     <!-- starting PCL-Cloud-Mirror-Nodelet -->

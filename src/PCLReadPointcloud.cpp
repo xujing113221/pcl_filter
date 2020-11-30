@@ -10,7 +10,8 @@ int main(int argc,char **argv){
     ros::Publisher pcl_pub=nh.advertise<sensor_msgs::PointCloud2> ("pcl_output",1);
     pcl::PointCloud<pcl::PointXYZ> cloud;
     sensor_msgs::PointCloud2 output;
-
+    
+    PCL_INFO("Initializing Read Pointcloud nodelet...\n");
     ros::Rate loop_rate(30);
     int frame_cnt = 0;
     while (ros::ok())
@@ -19,7 +20,7 @@ int main(int argc,char **argv){
         std::string filename("/home/xujing/Desktop/pointcloud_files/pcd_"+ std::to_string(frame_cnt) +".pcd");
         pcl::io::loadPCDFile(filename,cloud);
         pcl::toROSMsg(cloud,output);
-        output.header.frame_id="odom";
+        output.header.frame_id="cam_1_link";
 
         PCL_INFO("Publish new point cloud!\n");
 
