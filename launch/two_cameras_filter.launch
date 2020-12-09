@@ -7,14 +7,19 @@
   <arg name="camera1_serial" default="036222070486"/>
   <arg name="camera2_serial" default="034422073314"/>
   <arg name="use_rviz" default="true"/>
+  <arg name="simulation" default="false"/>
 
   <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
   <node ns="manager" pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
     <param name="num_worker_threads" value="16"/>
   </node>
 
+   <!-- Starting panda_simulation -->
+  <node if="$(arg simulation)" name="read_pcd" pkg="pcl_filter" type="read_pcd" />
+
+
   <!-- Starting the realsense2-camera using the realsense2-launch-file -->
-  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+  <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
     <!-- Set the nodelet manager -->
     <arg name="external_manager" value="true"/>
     <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
@@ -36,7 +41,7 @@
   </include>
 
   <!-- Starting the realsense2-camera using the realsense2-launch-file -->
-  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+  <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
     <!-- Set the nodelet manager -->
     <arg name="external_manager" value="true"/>
     <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
@@ -54,12 +59,14 @@
   <!-- load the settings for the Intel RealSense decimation filter of the camera -->
   <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
   <node
+      unless="$(arg simulation)"
       name="decimationSettingsLoader_1"
       pkg="dynamic_reconfigure"
       type="dynparam"
       args="load /cam_1/decimation $(find pcl_filter)/config/decimationFilterSettings.yaml"
       />
   <node
+      unless="$(arg simulation)"
       name="decimationSettingsLoader_2"
       pkg="dynamic_reconfigure"
       type="dynparam"
@@ -69,12 +76,14 @@
   <!-- load the settings for the Intel RealSense temporal filter of the camera -->
   <!-- settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure" -->
   <node
+      unless="$(arg simulation)"
       name="temporalSettingsLoader_1"
       pkg="dynamic_reconfigure"
       type="dynparam"
       args="load /cam_1/temporal $(find pcl_filter)/config/temporalFilterSettings.yaml"
       />
   <node
+    unless="$(arg simulation)"
     name="temporalSettingsLoader_2"
     pkg="dynamic_reconfigure"
     type="dynparam"
