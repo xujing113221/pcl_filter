@@ -1,13 +1,15 @@
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
-
+#define _USE_MATH_DEFINES
 #include <sensor_msgs/PointCloud2.h>
-
+#include <math.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl/common/transforms.h>
+#include <pcl/visualization/cloud_viewer.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>

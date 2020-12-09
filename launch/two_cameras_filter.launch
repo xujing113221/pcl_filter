@@ -1,6 +1,6 @@
 <launch>
   <arg name="nodelet_manager" default="nodelet_manager"/>
-  <arg name="tf_2camera" default="0.50625 0.60625 0 -84.0 0 0"/>
+  <arg name="tf_2camera" default="0 0 0 0 0 0"/>
   <arg name="disable_color" default="true"/>
   <arg name="camera1_name" default="cam_1"/>
   <arg name="camera2_name" default="cam_2"/>

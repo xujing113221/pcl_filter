@@ -113,3 +113,13 @@ Plan C:
 
 install ros:
     sudo apt install -y ros-melodic-desktop-full
+
+
+##calibration
+
+x:0.71875 + 0.50625
+y:-0.1375 + 0.60625
+z:0.5406250
+a:-20.625 - 84.0
+p:108.18750
+r:-209.5

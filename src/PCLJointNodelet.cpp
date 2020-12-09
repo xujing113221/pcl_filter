@@ -25,7 +25,7 @@ void PCLJointNodelet::onInit(){
   sync.registerCallback(boost::bind(&PCLJointNodelet::pointCloudCallback, this,_1, _2));
 
   pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("jointedPointCloud",10);
-
+  
   ros::spin();
 }
 
@@ -38,6 +38,7 @@ void PCLJointNodelet::onInit(){
  * @param right_input The message received from ROS as ConstPtr aka boost::shared_pointer
  *
  ******************************************************************************/
+static int32_t frame_cnt = 0;
 void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr left_pcl_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
@@ -53,6 +54,21 @@ void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPt
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr right_pcl_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
   pcl::fromROSMsg(*right_input, *right_pcl_pointcloud);
+
+  // std::string filename_left("/home/xujing/catkin_ws/pointcloud_files_left/pcd_left_"+ std::to_string(frame_cnt) +".pcd");
+  // std::string filename_right("/home/xujing/catkin_ws/pointcloud_files_right/pcd_right_"+ std::to_string(frame_cnt) +".pcd");
+  // pcl::PCDWriter writer;
+  // writer.write(filename_left,*left_pcl_pointcloud);
+  // writer.write(filename_right,*right_pcl_pointcloud);
+  // frame_cnt ++;
+
+  // Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
+  // transform_2.translation() << 0.71875, -0.1375, 0.540625;
+  // transform_2.rotate (Eigen::AngleAxisf (-20.625/180.0f*M_PI, Eigen::Vector3f::UnitZ()));
+  // transform_2.rotate (Eigen::AngleAxisf (108.18750/180.0f*M_PI, Eigen::Vector3f::UnitY()));
+  // transform_2.rotate (Eigen::AngleAxisf (-209.5/180.0f*M_PI, Eigen::Vector3f::UnitX()));
+  // pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
+  // pcl::transformPointCloud(*right_pcl_pointcloud, *transformed_cloud, transform_2);
 
   // joint pointclouds from left and right realsense camera 
   pcl::PointCloud<pcl::PointXYZ>::Ptr joint_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
