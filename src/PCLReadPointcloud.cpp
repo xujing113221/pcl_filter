@@ -19,8 +19,8 @@ int main(int argc,char **argv){
     while (ros::ok())
     {
         /* code for loop body */
-        std::string filename_left("/home/xujing/catkin_ws/pointcloud_files_left/pcd_left_"+ std::to_string(frame_cnt) +".pcd");
-        std::string filename_right("/home/xujing/catkin_ws/pointcloud_files_right/pcd_right_"+ std::to_string(frame_cnt) +".pcd");
+        std::string filename_left("/home/ning/catkin_ws/pointcloud_files_left/pcd_left_"+ std::to_string(frame_cnt) +".pcd");
+        std::string filename_right("/home/ning/catkin_ws/pointcloud_files_right/pcd_right_"+ std::to_string(frame_cnt) +".pcd");
 
         pcl::io::loadPCDFile(filename_left,cloud_left);
         pcl::toROSMsg(cloud_left,output_left);

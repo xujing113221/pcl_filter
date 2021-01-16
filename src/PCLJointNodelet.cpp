@@ -61,18 +61,37 @@ void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPt
   // writer.write(filename_left,*left_pcl_pointcloud);
   // writer.write(filename_right,*right_pcl_pointcloud);
   // frame_cnt ++;
+    // <arg name="tf_2camera" default="0.18 0.49 0 -0.71 0 0.104"/>
+  float x = 0.18;
+  float y = 0.49;
+  float z = 0;
+  float r_z = -0.71;
+  float r_y = 0;
+  float r_x = 0.104;
 
-  // Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
-  // transform_2.translation() << 0.71875, -0.1375, 0.540625;
-  // transform_2.rotate (Eigen::AngleAxisf (-20.625/180.0f*M_PI, Eigen::Vector3f::UnitZ()));
-  // transform_2.rotate (Eigen::AngleAxisf (108.18750/180.0f*M_PI, Eigen::Vector3f::UnitY()));
-  // transform_2.rotate (Eigen::AngleAxisf (-209.5/180.0f*M_PI, Eigen::Vector3f::UnitX()));
-  // pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
-  // pcl::transformPointCloud(*right_pcl_pointcloud, *transformed_cloud, transform_2);
+  Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
+  transform_2.translation() << x, y, z;
+  transform_2.rotate (Eigen::AngleAxisf (r_z, Eigen::Vector3f::UnitZ()));
+  transform_2.rotate (Eigen::AngleAxisf (r_y, Eigen::Vector3f::UnitY()));
+  transform_2.rotate (Eigen::AngleAxisf (r_x, Eigen::Vector3f::UnitX()));
+  
+  Eigen::Matrix4f T_c1w_c2w = transform_2.matrix();
+  Eigen::Matrix4f T_c_cw;
+  T_c_cw << 0,-1,0,0, 0,0,-1,0, 1,0,0,0, 0,0,0,1;
+  Eigen::Matrix4f T_c1_c2;
+  T_c1_c2 = T_c_cw * T_c1w_c2w * T_c_cw.inverse();
+
+
+  pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
+  pcl::transformPointCloud(*right_pcl_pointcloud, *transformed_cloud, T_c1_c2);
+
+  // std::cout<< transform_2.matrix() << std::endl;
+
 
   // joint pointclouds from left and right realsense camera 
   pcl::PointCloud<pcl::PointXYZ>::Ptr joint_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
-  *joint_pointcloud = *left_pcl_pointcloud + *right_pcl_pointcloud;
+  // *joint_pointcloud = *left_pcl_pointcloud + *right_pcl_pointcloud;
+  *joint_pointcloud = *left_pcl_pointcloud + *transformed_cloud;
 
   // pass through filter
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_filtered (new pcl::PointCloud<pcl::PointXYZ>);
@@ -96,6 +115,8 @@ void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPt
   // publish pointcloud
   sensor_msgs::PointCloud2 pub_pointcloud;
   pcl::toROSMsg(*cloud_filtered, pub_pointcloud);
+
+  pub_pointcloud.header = left_input->header;
 
   if(pub_Cloud.getNumSubscribers() > 0)
     pub_Cloud.publish(pub_pointcloud);

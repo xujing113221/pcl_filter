@@ -58,6 +58,7 @@ Output:
 ```
 or directly use script:
 ```bash
+roslaunch pcl_filter set_transform.launch
 sh ~/catkin_ws/src/pcl_filter/script/get_transform_info.sh
 ```
 

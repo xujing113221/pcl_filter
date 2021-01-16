@@ -1,6 +1,6 @@
 <launch>
   <arg name="nodelet_manager" default="nodelet_manager"/>
-  <arg name="tf_2camera" default="0 0 0 0 0 0"/>
+  <arg name="tf_2camera" default="0.18 0.49 0 -0.71 0 0.104"/>
   <arg name="disable_color" default="true"/>
   <arg name="camera1_name" default="cam_1"/>
   <arg name="camera2_name" default="cam_2"/>
@@ -22,7 +22,7 @@
   <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
     <!-- Set the nodelet manager -->
     <arg name="external_manager" value="true"/>
-    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/
 
     <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
     <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
