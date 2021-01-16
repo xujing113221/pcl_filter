@@ -3,6 +3,7 @@
 #include "pcl_filter/PCLJointNodelet.h"
 
 #include <pcl/io/pcd_io.h>
+#include <pcl/registration/icp.h>
 
 PLUGINLIB_EXPORT_CLASS(pcl_filter::PCLJointNodelet, nodelet::Nodelet)
 
@@ -87,11 +88,15 @@ void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPt
 
   // std::cout<< transform_2.matrix() << std::endl;
 
-
   // joint pointclouds from left and right realsense camera 
   pcl::PointCloud<pcl::PointXYZ>::Ptr joint_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
   // *joint_pointcloud = *left_pcl_pointcloud + *right_pcl_pointcloud;
   *joint_pointcloud = *left_pcl_pointcloud + *transformed_cloud;
+
+  // pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+  // icp.setInputSource(transformed_cloud);
+  // icp.setInputTarget(left_pcl_pointcloud);
+  // icp.align(*joint_pointcloud);
 
   // pass through filter
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_filtered (new pcl::PointCloud<pcl::PointXYZ>);

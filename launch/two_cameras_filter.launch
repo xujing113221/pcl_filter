@@ -22,7 +22,7 @@
   <include unless="$(arg simulation)" file="$(find realsense2_camera)/launch/rs_camera.launch">
     <!-- Set the nodelet manager -->
     <arg name="external_manager" value="true"/>
-    <arg name="manager" value="/manager/$(arg nodelet_manager)"/
+    <arg name="manager" value="/manager/$(arg nodelet_manager)"/>
 
     <!-- Enable the Pointcloud (RGB-Image disabled) and other filters -->
     <!-- Filter settings can be adjusted online when running "rosrun rqt_reconfigure rqt_reconfigure"-->
