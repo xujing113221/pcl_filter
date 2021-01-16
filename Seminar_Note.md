@@ -124,3 +124,41 @@ z:0.5406250
 a:-20.625 - 84.0
 p:108.18750
 r:-209.5
+
+
+## karman filter
+``` 
+# state vector
+x = [x,
+    y,
+    z,
+    vx,
+    vy,
+    vz]
+
+
+# x_k+1 = A*x_k
+# y_k = C*x_k
+
+# system matrix
+A = [1 0 0 dt 0   0;
+     0 1 0 0  dt  0;
+     0 0 1 0  0   dt;
+     0 0 0 0  0   0;
+     0 0 0 0  0   0
+     0 0 0 0  0   0]
+
+# output matrix
+C = [1, 0,  0,  0, 0, 0;
+    0 , 1,  0,  0, 0, 0;
+    0,  0,  1,  0, 0, 0]
+
+# process noise
+Q = sigma_Q * eye(6)
+
+# measurement noise
+R = sigma_R * eye(3)
+
+# covariance
+P0 = eye(6)
+```
