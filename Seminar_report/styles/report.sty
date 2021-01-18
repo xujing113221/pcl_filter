@@ -1,0 +1,197 @@
+% ------------------------------------------------------------------
+%
+%  Used packages and macros
+%
+% ------------------------------------------------------------------
+
+% ---------------------------------------------------------------------
+% Page layout
+% ---------------------------------------------------------------------
+\usepackage[a4paper,
+            inner=3.5cm, outer=2.5cm,
+            textheight=24cm,
+            headsep=1cm,
+            top=3cm,
+            headheight=14.5pt]{geometry}
+
+
+% ---------------------------------------------------------------------
+% paragraph spacing
+% ---------------------------------------------------------------------
+\parindent0mm
+\parskip1ex
+\linespread{1.03}
+
+
+% ---------------------------------------------------------------------
+% headings and footer
+% ---------------------------------------------------------------------
+\usepackage[automark]{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\clearscrheadfoot\setheadsepline{0.4pt}
+\renewcommand{\pagemark}{\textsf{\thepage}}
+\lohead{\leftmark}\rohead[]{\pagemark}             
+\rehead{\rightmark}\lehead[]{\pagemark}           
+\raggedbottom
+
+% ---------------------------------------------------------------------
+% fonts and formatting
+% ---------------------------------------------------------------------
+\setkomafont{caption}{\small}
+\setkomafont{captionlabel}{\small\textbf}
+\setkomafont{pageheadfoot}{\sffamily}
+
+% ---------------------------------------------------------------------
+%  packages
+% ---------------------------------------------------------------------
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc} 
+\usepackage{makeidx}
+\usepackage{amsmath,amsbsy,amsthm,amssymb,amsfonts}
+\usepackage{color,colortbl,tabularx,ifpdf}
+\usepackage{graphicx}
+\ifpdf
+  \DeclareGraphicsExtensions{.pdf,.jpg,.png,.ps,.eps}
+\else
+  \DeclareGraphicsExtensions{.eps,.ps,.png,.jpg,.pdf}
+\fi
+
+
+% ---------------------------------------------------------------------
+%  biblatex
+% ---------------------------------------------------------------------
+\usepackage[style=alphabetic,maxbibnames=99,backend=bibtex]{biblatex}
+\addbibresource{bibliography/references}
+\defbibheading{bibliography}[\bibname]{}
+
+
+% ---------------------------------------------------------------------
+%  hyperref package
+% ---------------------------------------------------------------------
+\ifpdf
+  \usepackage{hyperref}
+\else
+  \usepackage[hypertex]{hyperref}
+\fi
+\definecolor{dgreen}{rgb}{0,0.7,0}
+\definecolor{dblue}{rgb}{0,0,0.7}
+\definecolor{dred}{rgb}{0.7,0,0}
+\hypersetup{bookmarksnumbered=true,
+            plainpages=false,
+            colorlinks=true,
+            linkcolor=dblue,
+            citecolor=dgreen,
+            filecolor=dred,
+            urlcolor=blue}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  bold vectors and matrices
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\myvec{\boldsymbol}                         
+\def\nullv{ {\myvec 0} }
+\def\einsv{ {\myvec 1} }
+\def\xv{ {\myvec x} }
+\def\xdv{ \hat{\myvec x}   }            % x-Dach
+\def\xtv{ \tilde{\myvec x} }            % x-Tilde
+\def\xsv{ {\myvec x}^\ast }            % x-Stern
+\def\av{ {\myvec a} }
+\def\bv{ {\myvec b} }
+\def\cv{ {\myvec c} }
+\def\ev{ {\myvec e} }
+\def\epsv{ {\myvec e} }
+\def\fv{ {\myvec f} }
+\def\gv{ {\myvec g} }
+\def\hv{ {\myvec h} }
+\def\kv{ {\myvec k} }
+\def\mv{ {\myvec m} }
+\def\yv{ {\myvec y} }
+\def\zv{ {\myvec z} }
+\def\rv{ {\myvec r} }
+\def\uv{ {\myvec u} }
+\def\ov{ {\myvec o} }
+\def\pv{ {\myvec p} }
+\def\qv{ {\myvec q} }
+\def\tv{ {\myvec t} }
+\def\sv{ {\myvec s} }
+\def\vv{ {\myvec v} }
+\def\wv{ {\myvec w} }
+\def\Xv{ {\myvec X} }
+\def\bvt{ {\widetilde{\bv}} }
+\def\cvt{ {\widetilde{\cv}} }
+\def\hvt{ {\widetilde{\hv}} }
+\def\kvt{ {\widetilde{\kv}} }
+\def\xvt{ {\widetilde{\xv}} }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%        M A T R I Z E N            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\mymat{} % Matrizen wie skalare
+\def\nullmat{ {\mymat 0} }
+\def\Am{ {\mymat A} }
+\def\Atm{ \tilde{\mymat A} }
+\def\Bm{ {\mymat B} }
+\def\Cm{ {\mymat C} }
+\def\Dm{ {\mymat D} }
+\def\Em{ {\mymat E} }
+\def\Fm{ {\mymat F} }
+\def\Gm{ {\mymat G} }
+\def\Hm{ {\mymat H} }
+% \Im is imaginary part
+\def\Imat{ {\mymat I} }
+\def\Jm{ {\mymat J} }
+\def\Km{ {\mymat K} }
+\def\Lm{ {\mymat L} }
+\def\Mm{ {\mymat M} }
+\def\Nm{ {\mymat N} }
+\def\Om{ {\mymat O} }
+\def\Pm{ {\mymat P} }
+\def\Phim{ {\mymat \Phi} }
+\def\Qm{ {\mymat Q} }
+\def\Rm{ {\mymat R} }
+\def\Sm{ {\mymat S} }
+\def\Tm{ {\mymat T} }
+\def\Um{ {\mymat U} }
+\def\Vm{ {\mymat V} }
+\def\Wm{ {\mymat W} }
+\def\Xm{ {\mymat X} }
+\def\Ym{ {\mymat Y} }
+\def\Zm{ {\mymat Z} }
+\def\identitymat{\Em}
+\def\Amt{ {\widetilde{\Am}} }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fette Griechische Buchstaben %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\bldgreek#1{{\boldsymbol{#1}}}
+\def\alphav{ \bldgreek{\alpha} }
+\def\betav{ \bldgreek{\beta} }
+\def\gammav{ \bldgreek{\gamma} }
+\def\deltav{ \bldgreek{\delta} }
+\def\epsilonv{ \bldgreek{\epsilon} }
+\def\varepsilonv{ \bldgreek{\varepsilon} }
+\def\zetav{ \bldgreek{\zeta} }
+\def\etav{ \bldgreek{\eta} }
+\def\thetav{ \bldgreek{\theta} }
+\def\varthetav{ \bldgreek{\vartheta} }
+\def\iotav{ \bldgreek{\iota} }
+\def\kappav{ \bldgreek{\kappa} }
+\def\lambdav{ \bldgreek{\lambda} }
+\def\muv{ \bldgreek{\mu} }
+\def\nuv{ \bldgreek{\nu} }
+\def\xiv{ \bldgreek{\xi} }
+\def\piv{ \bldgreek{\pi} }
+\def\varpiv{ \bldgreek{\varpi} }
+\def\rhov{ \bldgreek{\rho} }
+\def\varrhov{ \bldgreek{\varrho} }
+\def\sigmav{ \bldgreek{\sigma} }
+\def\varsigmav{ \bldgreek{\varsigma} }
+\def\tauv{ \bldgreek{\tau} }
+\def\upsilonv{ \bldgreek{\upsilon} }
+\def\phiv{ \bldgreek{\phi} }
+\def\Phiv{ \bldgreek{\Phi} }
+\def\varphiv{ \bldgreek{\varphi} }
+\def\chiv{ \bldgreek{\chi} }
+\def\psiv{ \bldgreek{\psi} }
+\def\Psiv{ \bldgreek{\Psi} }
+\def\omegav{ \bldgreek{\omega} }
+\def\Sigmav{ \bldgreek{\Sigma} }
+

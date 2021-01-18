@@ -1,0 +1,79 @@
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.98]{helvet}
+\renewcommand{\familydefault}{phv}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[official,right]{eurosym}\def\Euro{\euro{}}
+\usepackage[bookmarks=false,pdfpagemode=UseNone]{hyperref}
+\usepackage[absolute]{textpos}
+\usepackage{fancyhdr}
+\usepackage{calc}
+
+\def\irtlogofile{styles/irt_black}
+\def\luhbrieflogo{styles/luh_brieflogo_blau}
+
+\newlength{\titoffset}\titoffset3cm
+
+% Vereinbarungen
+\newcommand{\fon}{+49-511-762-4512}
+\newcommand{\fax}{+49-511-762-4536}
+\newcommand{\email}{office@irt.uni-hannover.de}
+\newcommand{\irt}{Institute of Automatic Control}
+\newcommand{\prof}{}
+
+% Packages und Seitenformat
+\usepackage[includeheadfoot,a4paper,textwidth=160mm,head=6mm,
+            headsep=8mm,top=13.4mm,foot=8mm,height=278mm]{geometry}
+\parindent0mm
+\parskip0.6ex
+\pagestyle{myheadings}
+
+% Kommandos für Kopf und Datum
+\def\kopf#1{\def\header{#1}}
+\def\datum#1{\def\heute {#1}}
+\kopf{}
+\datum{}
+
+\usepackage[backend=bibtex,bibencoding=auto,doi=false,url=false,isbn=false,abbreviate=true,maxbibnames=99]{biblatex}
+\addbibresource{bibliography/references.bib}
+\addbibresource{irt.bib}
+\defbibheading{bibliography}[\bibname]{\subsubsection*{References}}
+
+\AtBeginDocument{
+    \begin{textblock*}{100mm}(1in+\oddsidemargin-1mm,14mm-\parskip)
+    \includegraphics[width=70mm]{\irtlogofile}%
+    \end{textblock*}%
+    \begin{textblock*}{60mm}(143.5mm,7.5mm-\parskip)%
+    \includegraphics[width=\hsize]{\luhbrieflogo}
+    \end{textblock*}%
+    \begin{textblock*}{36mm}(164.3mm,26mm-\parskip)%
+        \fontfamily{phv}
+        \fontsize{8pt}{10pt}\selectfont 
+        \irt\\
+        \prof\par
+      \ifx\heute\@empty\else Hannover, \heute\fi
+    \end{textblock*}%
+    \vspace*{3mm}
+    \markboth{\header}{\header}
+    \thispagestyle{fancy}\par\vspace{4mm}
+      \lhead{}\rhead{}\chead{}\renewcommand{\headrulewidth}{0.pt}\renewcommand{\footrulewidth}{0.4pt}\cfoot{
+          \fontfamily{phv}
+          \fontsize{8pt}{10pt}\selectfont 
+          Appelstr. 11, D-30167 Hannover\hfill Tel.: \fon, Fax.: \fax\hfill E-Mail: \email}
+}
+
+
+% ---------------------------------------------------------------------
+%  kompaktes Literaturverzeichnis ohne Überschrift
+\renewcommand{\thebibliography}[1]{%
+ \list%
+ {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}\leftmargin\labelwidth%
+ \advance\leftmargin\labelsep%
+ \usecounter{enumi}\itemsep-0ex}%
+ \def\newblock{\hskip .11em plus .33em minus .07em}%
+ \sloppy\clubpenalty4000\widowpenalty4000%
+ \sfcode`\.=1000\relax}%
+\renewcommand{\labelitemii}{$\circ$}
+

@@ -1,0 +1,17 @@
+if [ -f $1.ps ] 
+then 
+  ps2pdf -dEPSCrop $1.ps $1.pdf
+fi
+if [ -f $1.eps ]
+then
+  ps2pdf -dEPSCrop $1.eps $1.pdf
+fi
+if [ -f $1.PS ] 
+then 
+  ps2pdf -dEPSCrop $1.PS $1.pdf
+fi
+if [ -f $1.EPS ]
+then
+  ps2pdf -dEPSCrop $1.EPS $1.pdf
+fi
+

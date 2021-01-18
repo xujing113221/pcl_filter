@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ $# -lt 1  ]
+then
+  echo
+  echo ' fig2tex rel/path/to/file/fig-file [ps-export]'
+  echo
+  echo '   fig-file:          fig-file basename without extension'
+  echo '   rel/path/to/file   path of the file relative to the main tex-file'
+  echo '   ps-export          1 if a ps file shall be generated, too (default 0)'
+  echo
+
+  exit
+fi
+
+if [ $# -lt 2  ]
+then
+  DOPS=0
+else
+  DOPS=$2
+fi
+
+fig2dev -L pstex -m 1.00 $1.fig $1.ps 
+fig2dev -L pstex_t -m 1.00 -p $1 -F $1.fig $1.tex
+ps2pdf -dEPSCrop $1.ps $1.pdf
+
+if [ $DOPS -eq 0 ]
+then
+  rm $1.ps
+fi
+
+exit

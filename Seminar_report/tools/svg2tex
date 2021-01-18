@@ -1,0 +1,63 @@
+#!/bin/bash
+ 
+# Script for exporting a svg graphic into pstex/pdftex via inkscape.
+# Usage:
+#   sv2tex rel/path/to/file/svg-file [font-size] [ps-export]
+#     svg-file:          svg-file basename without extension
+#     rel/path/to/file   path of the file relative to the main tex-file
+#     font-size          desired font-size (default 10)
+#     ps-export          1 if a ps file shall be generated, too (default 0)
+# The script has to be invoked from the directory with the main tex-file
+ 
+if [ $# -lt 1  ]
+then
+  echo
+  echo ' sv2tex rel/path/to/file/svg-file [font-size] [ps-export]'
+  echo
+  echo '   svg-file:          svg-file basename without extension'
+  echo '   rel/path/to/file   path of the file relative to the main tex-file'
+  echo '   font-size          desired font-size (default 10)'
+  echo '   ps-export          1 if a ps file shall be generated, too (default 0)'
+  echo
+
+  exit
+fi
+
+BASE=$(basename $1)
+BPATH=${1%/*}/$BASE
+
+if [ $# -lt 2  ]
+then
+  FS=10
+else
+  FS=$2
+fi
+
+if [ $# -lt 3  ]
+then
+  DOPS=0
+else
+  DOPS=$3
+fi
+
+if [ $DOPS -eq 1 ]
+then
+  EXPORTPS=--export-ps=$BPATH.ps
+else
+  EXPORTPS=
+fi
+ 
+inkscape $BPATH.svg --export-pdf=$BPATH.pdf  $EXPORTPS --export-latex --export-area-drawing
+
+if [ $DOPS -eq 1 ]
+then
+  rm $BPATH.ps_tex
+fi
+ 
+sed -e s!$BASE.pdf!$BPATH!g $BPATH.pdf_tex > $BPATH.pdf2_tex
+sed -e s/"begingroup"/"begingroup\\\fontsize\{$FS\}\{$FS\}\\\selectfont"/ $BPATH.pdf2_tex > $BPATH.tex
+rm $BPATH.pdf_tex
+rm $BPATH.pdf2_tex
+ 
+exit
+
