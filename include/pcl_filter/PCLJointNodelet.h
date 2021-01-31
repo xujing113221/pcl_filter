@@ -15,6 +15,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/sync_policies/exact_time.h>
 
+
 #include <chrono>
 #include <thread>
 
@@ -28,10 +29,12 @@ class PCLJointNodelet : public nodelet::Nodelet
  public:
   virtual void onInit();
   void pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input);
-
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
   ros::NodeHandle private_nh;
   ros::Publisher pub_Cloud;
+  Eigen::Matrix4f tr_matrix;
+  Eigen::Matrix4f get_transform_matrix(const float tr_info[]);
 };
 
 }

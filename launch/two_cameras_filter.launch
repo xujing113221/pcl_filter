@@ -1,6 +1,6 @@
 <launch>
   <arg name="nodelet_manager" default="nodelet_manager"/>
-  <arg name="tf_2camera" default="0.18 0.49 0 -0.71 0 0.104"/>
+  <arg name="tf_2camera" default="0.6531 0.4375 0 -1.80642 0.05 0"/>   <!--x y z yaw pitch roll :radian--> 
   <arg name="disable_color" default="true"/>
   <arg name="camera1_name" default="cam_1"/>
   <arg name="camera2_name" default="cam_2"/>
@@ -11,7 +11,7 @@
 
   <!-- Starting the nodelet-manager for fast data-transfer between nodelets -->
   <node ns="manager" pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
-    <param name="num_worker_threads" value="16"/>
+    <param name="num_worker_threads" value="12"/>
   </node>
 
    <!-- Starting panda_simulation -->
