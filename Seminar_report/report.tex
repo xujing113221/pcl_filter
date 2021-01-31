@@ -4,19 +4,50 @@
 % load necessary packages
 % ---------------------------------------------------------------------
 \usepackage{styles/report}
-\usepackage{graphicx} %插入图片的宏包
-\usepackage{float} %设置图片浮动位置的宏包
-\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+	backgroundcolor=\color[RGB]{245,245,244}, 
+	basicstyle = \footnotesize,       
+	breakatwhitespace = false,        
+	breaklines = true,                 
+	captionpos = b,                    
+	commentstyle = \color{mygreen}\bfseries,
+	extendedchars = false,             
+	frame =none, 
+	framerule=0.5pt,
+	keepspaces=true,
+	keywordstyle=\color{blue}\bfseries, % keyword style
+	language = C++,                     % the language of code
+	otherkeywords={string}, 
+	numbers=left, 
+	numbersep=5pt,
+	numberstyle=\tiny\color{mygray},
+	rulecolor=\color{black},         
+	showspaces=false,  
+	showstringspaces=false, 
+	showtabs=false,    
+	stepnumber=1,         
+	stringstyle=\color{mymauve},        % string literal style
+	tabsize=2,          
+	title=\lstname                      
+}
+
 % ---------------------------------------------------------------------
 % some information
 % ---------------------------------------------------------------------
-\def\name{Ning Wang}
-\def\immatno{10027258}
-\def\thesis{Seminar report}
-\def\subject{Reglungstchnik\\[1ex] Ros}
-\def\supervisor{Beck Marin}
-%\def\firstexam{First Examiner}
-%\def\secondexam{Second Examiner}
+\def\name{Shi Jiahui,Wang Ning}
+\def\immatno{10027256(Shi),10027258(Wang)}
+\def\thesis{}
+\def\subject{Seminararbeit\\[1ex] Autonomous Motion Planning for Robotic Systems}
+\def\supervisor{M.Sc. Marvin Becker }
+\def\firstexam{First Examiner}
+\def\secondexam{Second Examiner}
 
 % ---------------------------------------------------------------------
 % Beginn des Dokuments
@@ -44,7 +75,8 @@
 % ---------------------------------------------------------------------
 % Conclusion
 % ---------------------------------------------------------------------
-\include{sections/conclusion}
+\include{sections/implementation}
+\include{sections/code} 
 
 % ---------------------------------------------------------------------
 % References

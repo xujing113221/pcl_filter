@@ -1,0 +1,35 @@
+% ---------------------------------------------------------------------
+\chapter{Code}
+% ---------------------------------------------------------------------
+\section{Turn on the camera}
+\section{Turn on the rviz}
+\section{Filter ,Turn on PCL}
+\section{Turn on get transform info.sh, calibration coordinate system}
+
+\begin{lstlisting}[caption={}]
+	#include "randomGenerator.h"
+	void normalNumGen(double mean, double sd,
+	int num, string filename){
+		const int nrolls=num; // number of eperiments
+		default_random_engine generator;
+		normal_distribution<double> dnorm(mean, sd);
+		ofstream outfile(filename,ios::out);
+		for(int i=0; i < nrolls; ++i){
+			double number = dnorm(generator);
+			outfile << number << endl;
+		}
+	}
+\end{lstlisting}
+\section{Adjust parameters, synthetic point cloud}
+
+\begin{lstlisting}[caption={}]
+	// pass through filter
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PassThrough<pcl::PointXYZ> pass;
+	pass.setInputCloud (joint_pointcloud);
+	pass.setFilterFieldName ("z");
+	pass.setFilterLimits (0.1, 1.0);  // 0.1~1.2m 
+	// pass.setFilterLimitsNegative (true);//lalallala
+	pass.filter (*cloud_pass_filtered); 
+\end{lstlisting}
+\section{Filter}
