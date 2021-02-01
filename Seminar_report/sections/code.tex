@@ -1,35 +1,214 @@
 % ---------------------------------------------------------------------
 \chapter{Code}
 % ---------------------------------------------------------------------
-\section{Turn on the camera}
-\section{Turn on the rviz}
-\section{Filter ,Turn on PCL}
-\section{Turn on get transform info.sh, calibration coordinate system}
+\section{PCLJointNodelet}
+ Prepare the ROS subscriber and publishers.\\	
+ The "pub\_Cluster" publisher will publish the clusters in the "CloudClusters" type for the next nodelet.\\
+ The "pub\_Cloud" publisher will publish the whole point cloud as "PointCloud2" for rviz visualization.\\
+ Subscribe the points collected by the camera1 and cemera2.
+ 
+\begin{lstlisting}[caption={}]
+void PCLJointNodelet::onInit(){
+	NODELET_INFO("Initializing PCL Joint nodelet...");
+	private_nh = getPrivateNodeHandle();
+	message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam1(private_nh, "/cam_1/depth/color/points", 10);
+	message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam2(private_nh, "/cam_2/depth/color/points", 10);
+	
+	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::PointCloud2> MySyncPolicy;
+	message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), sub_cam1, sub_cam2);
+	sync.registerCallback(boost::bind(&PCLJointNodelet::pointCloudCallback, this,_1, _2));
+	
+	pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("jointedPointCloud",10);
+	
+	ros::spin();
+\end{lstlisting}
+
+ The callback function called when something was published to the subscribed topic.\\
+ The function handles the Jointing of the received point cloud.\\
+ That is to convert the data type given by the camera into a data type that ros can recognize.
+\begin{lstlisting}[caption={}]
+static int32_t frame_cnt = 0;
+void PCLJointNodelet::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& left_input, const sensor_msgs::PointCloud2::ConstPtr& right_input){
+	
+	pcl::PointCloud<pcl::PointXYZ>::Ptr left_pcl_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
+	pcl::fromROSMsg(*left_input, *left_pcl_pointcloud);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr right_pcl_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
+pcl::fromROSMsg(*right_input, *right_pcl_pointcloud);
+\end{lstlisting}
+
+We get the coordinate value and the rotation vector through set\_transform. Substituting our values into the code, we can unify the coordinate systems of the two cameras and synthesize the point cloud.
+\begin{lstlisting}[caption={}]
+void PCLJointNodelet::onInit(){
+	NODELET_INFO("Initializing PCL Joint nodelet...");
+	private_nh = getPrivateNodeHandle();
+	message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam1(private_nh, "/cam_1/depth/color/points", 10);
+	message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cam2(private_nh, "/cam_2/depth/color/points", 10);
+	
+	float trans_info[6] = {0.6531,0.4375, 0, -103.5,3.0,0.0};  //x,y,z,a,p,r :degrees
+	tr_matrix = get_transform_matrix(trans_info);
+	
+	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::PointCloud2> MySyncPolicy;
+	message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), sub_cam1, sub_cam2);
+	sync.registerCallback(boost::bind(&PCLJointNodelet::pointCloudCallback, this,_1, _2));
+	
+	pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("jointedPointCloud",10);
+	
+	ros::spin();
+\end{lstlisting}
+
+Get transform matrix from the information(x,y,z,yaw,pitch,roll), convert.\\
+the point cloud of camera2 into point cloud of camera1.\\
+In this way, we only need to substitute the measured value, without calculating the rotation matrix.\\
 
 \begin{lstlisting}[caption={}]
-	#include "randomGenerator.h"
-	void normalNumGen(double mean, double sd,
-	int num, string filename){
-		const int nrolls=num; // number of eperiments
-		default_random_engine generator;
-		normal_distribution<double> dnorm(mean, sd);
-		ofstream outfile(filename,ios::out);
-		for(int i=0; i < nrolls; ++i){
-			double number = dnorm(generator);
-			outfile << number << endl;
-		}
+Eigen::Matrix4f PCLJointNodelet::get_transform_matrix(const float tr_info[]){
+	float x = tr_info[0];
+	float y = tr_info[1];
+	float z = tr_info[2];
+	float r_z = tr_info[3]/180.0f*M_PI;   //yaw
+	float r_y = tr_info[4]/180.0f*M_PI;   //pitch
+	float r_x = tr_info[5]/180.0f*M_PI;   //roll
+	
+	Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
+	transform_2.translation() << x, y, z;
+	transform_2.rotate (Eigen::AngleAxisf (r_z, Eigen::Vector3f::UnitZ()));
+	transform_2.rotate (Eigen::AngleAxisf (r_y, Eigen::Vector3f::UnitY()));
+	transform_2.rotate (Eigen::AngleAxisf (r_x, Eigen::Vector3f::UnitX()));
+	
+	Eigen::Matrix4f T_c1w_c2w = transform_2.matrix();
+	Eigen::Matrix4f T_c_cw;
+	T_c_cw << 0,-1,0,0, 0,0,-1,0, 1,0,0,0, 0,0,0,1;
+	Eigen::Matrix4f T_c1_c2;
+	T_c1_c2 = T_c_cw * T_c1w_c2w * T_c_cw.inverse();
+	return T_c1_c2;
+\end{lstlisting}
+
+
+
+Synthesize the data of 2 cameras, filter the band-pass filter to limit the depth of field to 0.1 to 1m to reduce the data required to be processed.\\
+Then down-sampling is used to remove the repeated point cloud points of the two cameras. The purpose is to reduce data points and increase the calculation speed.
+\begin{lstlisting}[caption={}] pcl::PointCloud<pcl::PointXYZ>::Ptr joint_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
+
+pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+pcl::PassThrough<pcl::PointXYZ> pass;
+pass.setInputCloud (joint_pointcloud);
+pass.setFilterFieldName ("z");
+pass.setFilterLimits (0.1, 1.0);  // 0.1~1.2m 
+
+float leaf_size = 0.002f;
+pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+pcl::VoxelGrid<pcl::PointXYZ> sor;    
+sor.setInputCloud(cloud_pass_filtered);            
+sor.setLeafSize(leaf_size,leaf_size,leaf_size);           
+sensor_msgs::PointCloud2 pub_pointcloud;
+pcl::toROSMsg(*cloud_filtered, pub_pointcloud);
+
+pub_pointcloud.header = left_input->header;
+
+if(pub_Cloud.getNumSubscribers() > 0)
+pub_Cloud.publish(pub_pointcloud);
+\end{lstlisting}
+
+\section{PCLFilterNodelet}
+Subscribe to data generated by Joint
+\begin{lstlisting}[caption={}]
+void PCLFilterNodelet::onInit(){
+	NODELET_INFO("Initializing PCL Filter nodelet...");
+	private_nh = getPrivateNodeHandle();
+	sub_ = private_nh.subscribe("/camera/depth/color/points", 10, &PCLFilterNodelet::pointCloudCallback, this);
+	// sub_ = private_nh.subscribe("/PCLNodelets/PCLJointNodelet/jointedPointCloud", 1, &PCLFilterNodelet::pointCloudCallback, this);
+	pub_Cluster = private_nh.advertise<pcl_filter::CloudClusters>("filteredPointClusters",10);
+	pub_Cloud = private_nh.advertise<sensor_msgs::PointCloud2>("filterdPointCloud",10);
+	
+	private_nh.param("useDownsample", useDownsample, false);
+	NODELET_INFO(useDownsample ? "Filter nodelet is using downsampling!" : "Filter nodelet is not using downsampling!");
+}
+\end{lstlisting}
+
+
+
+creates a handler thread that will do the work the caller of the callback function can return and The handler thread will handles the filtering of the received point cloud.
+\begin{lstlisting}[caption={}]
+void PCLFilterNodelet::pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr message){
+		handler(message);
+		
 	}
+	static int frame_cnt =0;
+	void PCLFilterNodelet::handler(const sensor_msgs::PointCloud2ConstPtr message){
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>),cloud_m (new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::fromROSMsg(*message, *cloud);
+		
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 \end{lstlisting}
-\section{Adjust parameters, synthetic point cloud}
+
+
+Creating the filtering object: downsample the dataset using a leaf size of 1,5cm Optional just has to be done when using the gazebo simulation.
+\begin{lstlisting}[caption={}]
+  if (useDownsample) {
+	pcl::VoxelGrid<pcl::PointXYZ> vg;
+	vg.setInputCloud(cloud);
+	vg.setLeafSize(0.015f, 0.015f, 0.015f);
+	vg.filter(*cloud_filtered);
+} else {
+	cloud_filtered = cloud;
+}
+
+pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+sor.setInputCloud(cloud_filtered);
+sor.setMeanK(20);
+sor.setStddevMulThresh(0.7);
+sor.filter(*cloud_filtered);
+\end{lstlisting}
+
+
+Create the segmentation object for the planer model and set all the parameters and contain the plane parameters in "values" (in ax+by+cz+d=0).\\
+The plane model creates the segmentation object and sets all the parameters (classes that use surface normals for plane segmentation). Set the random sampling consistency method type. Set the distance threshold. The distance threshold determines the condition that a point must be considered as an interior point. Indicates the maximum distance from the point to the estimated model.\\
+In order to process the point cloud containing multiple models, the process is executed in a loop, and after each model is extracted, we save the remaining points and iterate; the points in the model are obtained through the segmentation process; when there is 30\% of the original Exit the loop when point cloud data.\\
+Finally separate the inner layer\\
+
 
 \begin{lstlisting}[caption={}]
-	// pass through filter
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_filtered (new pcl::PointCloud<pcl::PointXYZ>);
-	pcl::PassThrough<pcl::PointXYZ> pass;
-	pass.setInputCloud (joint_pointcloud);
-	pass.setFilterFieldName ("z");
-	pass.setFilterLimits (0.1, 1.0);  // 0.1~1.2m 
-	// pass.setFilterLimitsNegative (true);//lalallala
-	pass.filter (*cloud_pass_filtered); 
+sor.setInputCloud(cloud_filtered);
+sor.setMeanK(20);
+sor.setStddevMulThresh(1);
+sor.filter(*cloud_filtered);
+
+pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+tree->setInputCloud(cloud_filtered);
+
+std::vector<pcl::PointIndices> cluster_indices;
+pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+ec.setClusterTolerance(0.05); // 5cm
+ec.setMinClusterSize(35);
+ec.setMaxClusterSize(25000);
+ec.setSearchMethod(tree);
+ec.setInputCloud(cloud_filtered);
+ec.extract(cluster_indices);
 \end{lstlisting}
-\section{Filter}
+
+
+Use pcl::StatisticalOutlierRemoval<pcl::PointXYZ> to remove abnormal points.\\
+Creating the KdTree object for the search method of the extraction this will detected the clusters, which represent the objects.
+\begin{lstlisting}[caption={}]
+	pcl_filter::CloudClusters msg;
+	msg.num_cluster = cluster_indices.size();
+	pcl::toROSMsg(*cloud_filtered, msg.pointCloud);
+	
+	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it) {
+		pcl_msgs::PointIndices msgIndices;
+		pcl_conversions::fromPCL(*it, msgIndices);
+		msg.cluster_indices.push_back(msgIndices);
+	}
+	
+	if(pub_Cluster.getNumSubscribers()>0)
+	pub_Cluster.publish(msg);
+	
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	
+	NODELET_INFO("PointClusters published! Filtering took %3.3f [ms]", std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() /1000000.0f);
+	if(pub_Cloud.getNumSubscribers()>0)
+	pub_Cloud.publish(msg.pointCloud);
+\end{lstlisting}
+Publish the filterd clusters .\\

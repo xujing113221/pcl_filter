@@ -1,19 +1,24 @@
 % ---------------------------------------------------------------------
 \chapter{Introduction}
 % ---------------------------------------------------------------------
-Robots are becoming more important in everyday live. Because robots usually work in  a dynamic environments,The robot has to adapt its paths according to the changing environment.For this reason motion planning is an important part for robotics research. In this thesis an algorithm is developed which can create an environment representation suitable for a motion planning algorithm based on point clouds received from a capturing device.
-\section{ROS}
-ROS (Robot Operating System) is an open source system for operating robots on a computer. A ROS system usually consists of a large number of nodes, any of which can communicate with other nodes in a publish/subscribe manner. As a flexible operating system, the nodes on ROS have great arbitrariness. They can be located on different computers or even on different networks.
-In this algorithm, first we have an administrator (ROS Master) to manage our entire system, and then we need to establish three nodes, namely the camera node, the image processing node in the robot, and the display node on the computer. Then, under the management of ROS Master, the camera node (Camera Node) initiates a session (Topic) to send image information, and at the same time, the other two nodes subscribe to this session (Topic)(For example picture 2.1). 
+\section{Task}
+According to the task, there are two functions, namely the synthesis of object point cloud information and object recognition and tracking. These functions will be based on the ROS operating system using the C++ programming language.
+In the first task, because the image collected by one camera is incomplete, it is necessary to use two cameras to collect information together, and then synthesize complete object information. First, you need to use two realsence D435i cameras to collect the point cloud information of the object, and then use the rotation matrix to unify the coordinate systerm of the obtained information, then perform the point cloud information fusion, and finally filter to obtain the final composite image.
+The second task is tracking and identifying objects.
+\section{Motivation}
+Computer engineering students need not only knowledge of algorithms and computers, but also programming skills in order to find good and suitable jobs in the future.
+Through small seminars, we should use the object-oriented programming language C++ to complete the task on the ROS system.
+At the same time, project development experience can also be obtained.
+In recent years, the Python programming language has been more popular on the market. However, some programming languages such as C++ with pointers reflect some of the development principles of computers in software and hardware. Therefore, with the help of C++ knowledge, we can be faster and easier to master other programming languages, such as Java and Python.\\
+\begin{figure}[htp]
+	\centering % 图片居中
+	\includegraphics[width = 15.3cm]{figures/Motivation}
+	\caption{Ranking list of programming languages in Tobi}
+	\label{fig:figure1label}
+\end{figure}
 
-\section{PCL}
-The Point Cloud Library (PCL) is a standalone, large scale, open project for 2D/3D image and point cloud processing. PCL is released under the terms of the BSD license, and thus free for commercial and research use.
-\section{D435i}
-In this experiment, we used two binocular cameras to obtain point cloud depth information to synthesize objects. We tested several different cameras.
--The Intel Realsense SR300 camera uses a structured camera. Each camera emits a light signal of a certain frequency, and then uses the reflection of light to obtain depth information. Therefore, when two cameras work at the same time, light interference will inevitably occur.
--Kinect is a Tof camera and must emit a continuous laser, so there will be interference. In addition, Kinect is too large, which is not conducive to laboratory placement and measurement.
--The principle of RealsenseD455 is binocular stereo vision. Do not rely on reflected light to measure depth information, but the minimum measurement distance is 0.4 meters. The experimental environment we require is less than 0.4 meters, so it is not suitable.
-- D435 This kind of camera is a binocular depth camera, it is based on the principle of parallax to obtain the three-dimensional geometric information of the object, and will not actively emit light, so two identical D435 will not interfere with each other. And the minimum measurement distance of D435i is 0.1 meters.
--Realsense D435i has the same principle and structure as D435, but D435i has built-in IMU (D435 has no built-in IMU).
-So I chose D435i as the camera for this experiment
+In addition, the required functions must be implemented in Linux. The code has been integrated into the Linux command line. So you can also understand the operating system, which covers a wide range of fields, even in short-term papers.
 
+
+
+	

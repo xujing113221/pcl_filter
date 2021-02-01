@@ -1,0 +1,27 @@
+% ---------------------------------------------------------------------
+\chapter{Tracking ID}
+% ---------------------------------------------------------------------
+\section{Kalman}
+Kalman filtering is an algorithm that uses linear system state equations to optimally estimate system state through system input and output observation data. Since the observation data includes the influence of noise and interference in the system, the optimal estimation can also be regarded as a filtering process.\\
+Data filtering is a data processing technology to remove noise and restore real data. Kalman filtering can estimate the state of the dynamic system from a series of data with measurement noise when the measurement variance is known.\\
+
+
+1. Use the last optimal state estimation and optimal estimation error to calculate this prior state estimation and prior error estimation;\\
+2. Use step 1 to obtain the prior error estimation and measurement noise to obtain the Kalman gain;\\
+3. Use steps 1, 2 to get all prior error estimates and measurement noise, and get the best estimate this time.\\
+Explanation: weight the predicted value of the model and the actual observation value, and iteratively calculate the future state.\\
+That is: weight the predicted value of the model and the actual observation value, and iteratively calculate the future state\\
+
+
+In addition\\
+Priori: Derive based on past results
+Posterior: after getting the current result, go to correct it.\\
+Kalman gain effect: Turn "rough estimate" into "most accurate estimate".\\
+The fundamental problem solved by Kalman filtering: how to minimize the interference of noise (noise: can be understood as the actual value-the minimum predicted value).\\The essence of Kalman filter: parameterized Bayesian model.\\
+The core idea of the algorithm: According to the current instrument "measured value" and the "predicted value" and "error" of the previous moment, the current optimal amount is calculated, and then the next moment's amount is predicted.\\
+\section{Solutions}
+\subsection{Method 1-Kalrman fliter}
+We get the feature of each pointcloud cluster, such as the center of each pointcloud.  we can get the currcent state S$_n$ and the last state S$_{n-1}$. Then we use karlman filter to estimate the current state S$_n$ from the last state S$_{n-1}$, so that we can track each pointcloud of object.\\
+we subscribe the pointcloud cluster from PCL filter, calculate the center of each pointcloud, and number each point cloud. for each point cloud we estimate the currcent position, then compare the actual center position of current point clouds. finally we can correct nummber them.\\
+\subsection{Method 2-Machine learning }
+we can use machine learing to identify objects. for example, we can use color point clouds to track objects of different colors by simply identifying colors. So that we can use more object information to identify objects, such as shape, size, color and so on. Analyze specific issues.\\
